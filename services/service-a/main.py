@@ -1,3 +1,4 @@
+import os
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -10,7 +11,13 @@ from cors_setup import configure_cors
 from logging_utils import log_event
 
 SERVICE_NAME = "service-a"
-WORKER_URL = "http://127.0.0.1:8001/work"
+_default_worker_url = "http://127.0.0.1:8001/work"
+_worker_url = os.getenv("WORKER_URL", _default_worker_url).strip()
+WORKER_URL = (
+    _worker_url
+    if _worker_url.endswith("/work")
+    else f"{_worker_url.rstrip('/')}/work"
+)
 TRACE_HEADER = "X-Trace-Id"
 
 

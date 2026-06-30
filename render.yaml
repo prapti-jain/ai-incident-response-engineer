@@ -1,0 +1,59 @@
+# Render Blueprint — AI Incident Response Engineer backends
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: incident-telemetry
+    runtime: python
+    plan: free
+    rootDir: services/telemetry
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      # Comma-separated browser origins (e.g. https://your-frontend.onrender.com)
+      - key: CORS_ORIGINS
+        sync: false
+
+  - type: web
+    name: incident-service-a
+    runtime: python
+    plan: free
+    rootDir: services/service-a
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: TELEMETRY_URL
+        fromService:
+          name: incident-telemetry
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: WORKER_URL
+        fromService:
+          name: incident-service-b
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: CORS_ORIGINS
+        sync: false
+
+  - type: web
+    name: incident-service-b
+    runtime: python
+    plan: free
+    rootDir: services/service-b
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: TELEMETRY_URL
+        fromService:
+          name: incident-telemetry
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: CORS_ORIGINS
+        sync: false
