@@ -1,0 +1,30 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Environment / secrets
+.env
+.env.local
+*.env
+services/*/.env
+frontend/.env.local
+
+# Runtime (local process management)
+.run/
+*.log
+*.pid
+
+# Node (frontend)
+node_modules/
+.next/
+
+# OS
+.DS_Store
