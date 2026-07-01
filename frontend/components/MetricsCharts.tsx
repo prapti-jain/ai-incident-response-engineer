@@ -63,10 +63,8 @@ export default function MetricsCharts({ data, lastUpdated }: Props) {
 
       {empty ? (
         <div className="rounded-lg border border-dashed border-[#2a2f38] bg-[#12161c] px-4 py-12 text-center text-sm text-[#6b7280]">
-          No metric samples yet. Send traffic via{" "}
-          <code className="font-mono text-[#9ca3af]">
-            curl -X POST http://localhost:8000/request
-          </code>
+          No metric samples yet. Click the Fault Injection buttons above to
+          generate traffic.
         </div>
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
