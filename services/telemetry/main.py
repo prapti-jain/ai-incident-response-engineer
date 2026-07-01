@@ -5,6 +5,8 @@ import sys
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
 
+from alembic import command
+from alembic.config import Config
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
@@ -49,6 +51,11 @@ def configure_logging() -> logging.Logger:
 logger = configure_logging()
 
 
+def run_migrations() -> None:
+    alembic_cfg = Config("alembic.ini")
+    command.upgrade(alembic_cfg, "head")
+
+
 async def anomaly_detection_loop(app: FastAPI) -> None:
     logger.info(
         "anomaly detection background task started (interval=%ss, first check immediate)",
@@ -73,6 +80,9 @@ async def anomaly_detection_loop(app: FastAPI) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    run_migrations()
+    logger.info("database migrations applied")
+
     db = SessionLocal()
     try:
         sync_trackers_from_db(db)
